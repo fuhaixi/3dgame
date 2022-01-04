@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+    <style>
+        html,body{
+            height: 100%;
+            margin: 0;
+        }
+        #scene{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #back_button{
+            background: #000;
+        }
+        #UI{
+          position: absolute;
+          
+        }
+        .icon{
+          width: 32px;
+          height: 32px;
+          margin-right: 10px;
+      
+        }
+    </style>
+  </head>
+  <body>
+    <canvas id='scene'></canvas>
+    <div id="UI">
+      <button id="back_button" style="background: transparent;border-style: none;margin: 16px;" onclick="window.location='index.html'">
+        <svg class="icon" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 13L1 7L7 1" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+    </div>
+    <script type="module" src="model_scene.js"></script>
+  </body>
+  
+</html>
