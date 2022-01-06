@@ -10,21 +10,28 @@ import { Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment'
 import { PMREMGenerator } from 'three';
 import { Box3Helper } from 'three';
+import { Box3 } from 'three';
 
 
 
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+let aspect = window.innerWidth / window.innerHeight
+// const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+let fram_size = 20
+const camera = new THREE.OrthographicCamera(-fram_size*aspect/2,fram_size*aspect/2,fram_size/2,-fram_size/2)
 const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector("#scene")
+    canvas: document.querySelector("#scene"),
+    antialias: true 
 });
 const sceneBox = new THREE.Box3(new Vector3(-2,0,-2),new Vector3(2,4,2))
 const control = new OrbitControls(camera, renderer.domElement)
-_init()
-animate()
+let ani =false
 const clock = new THREE.Clock();
 let mixer;
+
+_init()
+animate()
 
 function _init() {
     //init scene
@@ -32,8 +39,7 @@ function _init() {
     renderer.outputEncoding = THREE.sRGBEncoding;
     // scene.add(new GridHelper())
     scene.background = new THREE.Color(0xbfe3dd);
-    // const ambientLight = new THREE.AmbientLight(0xffffff)
-    // scene.add(ambientLight)
+
     camera.position.set(10, 10, 10)
     camera.lookAt(new Vector3(0, 0, 0))
     control.enableDamping = true
@@ -56,6 +62,7 @@ function _init() {
             
             // fit_into_box(sceneBox,model)
             scene.add(model)
+            showModelBox(model)
             console.log(model)
         }, undefined, (e) => {
             alert(e)
@@ -67,12 +74,14 @@ function _init() {
             scene.add(gltf.scene)
             console.log(gltf.scene)
             const animations = gltf.animations;
-            console.log(animations)
-            mixer = new THREE.AnimationMixer( gltf.scene );
-            const action=mixer.clipAction(animations[0])
-            console.log(mixer)
             
-            action.play()
+            mixer = new THREE.AnimationMixer( gltf.scene );
+            
+            mixer.clipAction( gltf.animations[ 0 ] ).play();
+            ani=true
+            
+            showModelBox(gltf.scene)
+            
         })
     }
 
@@ -89,11 +98,14 @@ function animate() {
     requestAnimationFrame(animate);
     control.update()
     renderer.render(scene, camera);
-    // mixer.update(clock.getDelta())
+    if(ani == true){
+
+        mixer.update(clock.getDelta())
+    }
 }
 
 function fit_into_box(sceneBounds,model) {
-    lengthMeshBounds = new THREE.Box3().setFromObject(model)
+    let meshBounds = new THREE.Box3().setFromObject(model)
     // Calculate side lengths of scene (cube) bounding box
     let lengthSceneBounds = {
         x: Math.abs(sceneBounds.max.x - sceneBounds.min.x),
@@ -128,7 +140,12 @@ function fit_into_box(sceneBounds,model) {
 
 
 function onResize() {
-    camera.aspect = window.innerWidth / window.innerHeight
+    aspect = window.innerWidth / window.innerHeight
+    // camera.aspect = aspect
+    camera.left = -fram_size/2*aspect
+    camera.right = fram_size/2*aspect
+    camera.top = fram_size/2
+    camera.bottom = -fram_size/2
     camera.updateProjectionMatrix()
     renderer.setSize(window.innerWidth, window.innerHeight)
 }
@@ -149,6 +166,10 @@ function onMouseClick(event) {
     console.log(intersects)
 
     
+}
+
+function showModelBox(model){
+    scene.add(new Box3Helper(new Box3().setFromObject(model),new THREE.Color(0xff0000)))
 }
 
 
